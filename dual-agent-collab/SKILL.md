@@ -42,9 +42,14 @@ description: 双 Agent 协作评审工作流（主执行 Agent + DeepSeek 独立
 
 ## 评审编号与档案（可溯源核心）
 
-- 评审编号：`RV-YYYYMMDD-NN`（NN 每日递增）；方案编号 `F-xxx`；决策编号 `D-NNN`
+**三个 ID 必须分清**（实战中三者不同源，混用是常见事故源）：
+- **RV-ID**：评审档案的唯一标识 `RV-YYYYMMDD-NN`（NN 为**当日序号**，如 RV-20260928-03）。写在档案 frontmatter `id:` 与索引"主题"列
+- **索引序号**：台账行号（# 列），**每日/全表递增**——`adopt` 会追加新行，因此**索引序号 ≠ RV 号**。真实反例：RV-20260927-231 对应索引序号 232
+- **GATE-ID**：门禁动作记录 `GATE-YYYYMMDD-NN`（提交闸门拦截时生成，另见 gates.md）
+
 - 档案目录（默认）：`<工作区>/dual-agent/reviews/`，结构见 archive-format.md
 - 每次评审必须落盘：原始请求/响应 JSON + 索引行（含状态），供事后审计
+- 提交信息引用 RV 时，门禁按"日期-RV号"前缀（如 `2026-09-28-03-`）在索引中定位，**不是按序号**——索引行必须包含该前缀（通常落在档案文件名列）
 
 ## 快速开始
 
@@ -67,6 +72,8 @@ DEEPSEEK_API_KEY=<key> python3 scripts/deepseek_review.py \
 - `--force`：同一 topic 重审时跳过"已存在"检查
 - 结论必须为：`通过` / `有条件通过`（列出条件）/ `拒绝`（列出原因）
 - 有条件通过 = 按条件修复后补一次轻量复核或由主 Agent 逐条说明如何满足
+
+**脚本定位（重要，防误用）**：`scripts/deepseek_review.py` 是**通用最小版**——只做"调用 DeepSeek + 原始 JSON 落盘 + 追加索引行"。项目级能力（双 hash 校验、.md 档案生成、evtools 只读证据、敏感词通道、多轮历史压缩、`--light`）**不在通用脚本内**，由使用方按 archive-format.md / gates.md 扩展接入（参考实现：project-trace/agent-communication-demo/deepseek_gate.py）。
 
 ## 决策与收益评估
 
