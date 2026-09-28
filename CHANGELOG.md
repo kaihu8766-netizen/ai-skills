@@ -6,6 +6,10 @@
 
 - **v2.1 降级门禁升级（dual-agent-collab）**：修复"静默降级"缺陷（无 DeepSeek key 时未询问即降级为子代理）。核心：SKILL.md 新增第 0 步「环境检查与降级门禁」（无 key 必须先单独询问用户并等待裁决，A 提供 key / B 同意降级 / C 跳过；重大/不可逆/对外交付类不可选 B，无独立复核 BLOCKED；路由归属明确功能性工作不得归 C；分类争议 fail-closed）；review-framework.md 新增「独立复核判据 5 条」（子代理=degraded 不算独立复核，硬门只认受控通道 RV 档案）+ 自证清白反制；light-archive.md 新增「降级记录」字段（status=degraded + 用户同意 + 硬门口径）；deepseek_review.py 补哈希留痕（raw prompt_hash/response_hash + 索引行 hash，防落盘后改写）；deps.md 补 key 三类注入入口；新增 references/env-check.md（1 分钟环境自检）。DeepSeek 终审 RV-20260929-07 adopted。
 
+## 2026-09-29
+
+- **v2.2 讨论触发机制修复（dual-agent-collab）**：修复"别的对话框加载技能后不知道要讨论"（v2.1 遗留：description 触发条件全为用户显式要求 + 无开工判定仪式，不讨论是默认行为而非显式违约）。核心：description 改为档位语义默认触发（凡可能产出交付物的任务动手前先按路由表判定）；新增核心流程第 0 步「开工三问·任务路由判定」（先显式输出判定行：任务类型=…、事前讨论=要/不要、事后复核=要/不要、理由=…，不讨论变成可被当场抓到的违约；判定行落档案不得自我放宽到跳过档，fail-closed）；light-archive.md 补「路由判定」字段；env-check.md 新增第 6 项「开工三问触发」自检（新会话不自知=FAIL）。DeepSeek 终审 RV-20260929-10 adopted。
+
 ## 2026-09-28
 
 - **v2 通用化改造（dual-agent-collab）**：从"企业级评审门禁"泛化为"通用双 Agent 协作"——新增任务路由表（重大/功能/搜索/琐事分级讨论与复核强度）、联网取证流程（references/research.md：事实点拆解、来源 S/A/B/C 分级、交叉验证、引用格式）、轻量档案（references/light-archive.md：无仓库自动存主 Agent 工作区）；门禁降级为可选高级模式（gates.md 显式 fail-closed 声明）；SKILL.md 重写为通用路由版（附简历快速开始示例）
