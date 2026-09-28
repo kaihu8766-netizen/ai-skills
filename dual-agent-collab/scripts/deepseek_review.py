@@ -9,7 +9,7 @@
 项目专用门禁（diff_hash、敏感词通道、gate 规则）不属于本脚本——那是
 使用方在 gates.md 描述的 commit-msg 钩子/本地校验层的事。
 """
-import argparse, datetime, json, os, re, sys, urllib.request, urllib.error
+import argparse, datetime, hashlib, json, os, re, sys, urllib.request, urllib.error
 
 API_URL = "https://api.deepseek.com/chat/completions"
 MODEL_DEFAULT = "deepseek-chat"  # flash 模式：便宜、快，评审够用
@@ -104,13 +104,16 @@ def main():
         "response": content,
         "usage": usage,
         "conclusion": conclusion,
+        # RV-20260929-04 条件：哈希留痕——原始请求/响应 sha256[:16]，防落盘后改写（判据 2 落盘锚点）
+        "prompt_hash": hashlib.sha256(args.prompt.encode("utf-8")).hexdigest()[:16],
+        "response_hash": hashlib.sha256(content.encode("utf-8")).hexdigest()[:16],
         "created_at": datetime.datetime.now().astimezone().isoformat(),
     }
     with open(fpath, "w", encoding="utf-8") as f:
         json.dump(record, f, ensure_ascii=False, indent=2)
 
     archname = f"{ymd}-{nn:02d}-{topic_slug}.md"
-    row = f"| {nn:02d} | {ymd} | {args.topic} | 见档案（{archname}） | {conclusion} | {archname} | 见档案 |\n"
+    row = f"| {nn:02d} | {ymd} | {args.topic} | 见档案（{archname}） | {conclusion} | {archname} | 见档案 | prompt_hash={record['prompt_hash']} |\n"
     append_index(args.out_dir, row)
 
     print(f"[gate] 评审结论: {conclusion}")

@@ -1,4 +1,21 @@
-# deps.md — dual-agent-collab 运行依赖
+# deps.md — dual-agent-collab 运行依赖与 key 配置
 
 无外部依赖（纯 Python 标准库 + DeepSeek HTTP API）。
-需 python3（≥3.8）；调用时须提供环境变量 `DEEPSEEK_API_KEY`。
+需 python3（≥3.8）；调用评审通道须提供 `DEEPSEEK_API_KEY`。
+
+## DeepSeek API key 配置（用户如何给环境）
+
+三种注入入口（按环境能力选择，**先问用户再判断，禁止未询问自行认定"无入口"**）：
+
+1. **环境变量注入**（推荐）：`DEEPSEEK_API_KEY=<key> python3 scripts/deepseek_review.py ...`。
+   key 不落盘、不入 git、不回显、不用后即清（密钥安全规范：先撤销再排查、一次一用）。
+2. **会话内询问**：无环境变量入口时，**主动向用户索取**（用户在本会话提供，TLS 通道）。
+   收到后仅经环境变量注入给脚本调用，不回显、不转存到任何项目文件/日志。
+3. **配置文件**：仅限明确支持密钥配置文件的环境（如 `.env` 且已被 `.gitignore` 排除）；
+   权限 `chmod 600`，用后即删。
+
+禁止：写死进脚本/代码、入 git、在聊天记录/演示截图展示完整 key、落日志。
+
+轮换：每个 key 用完建议立即在平台撤销、下次新建（一次一用）。
+
+判定"无 key 注入入口"前，必须先执行 SKILL.md 第 0 步（询问用户），不得自行降级。

@@ -3,7 +3,7 @@ name: dual-agent-collab
 description: 通用双 Agent 协作模式（主执行 Agent + DeepSeek 独立评审/讨论 + 人类最终裁决）。适用于各种非代码与代码任务：简历制作、日常工作（邮件/总结/方案/文档）、日常搜索与调研、写作、方案设计、产品开发等。核心保证：事前讨论、事后复核、联网取证（关键事实强制验证）、全过程可溯源（轻量档案）。当用户要求"先和 DeepSeek 讨论再动手"、"做完帮我复核"、"靠谱地干活"、"帮我联网查证"、"全过程留痕"时使用；需配置 DeepSeek API key。
 ---
 
-# 双 Agent 协作模式（通用版 v2）
+# 双 Agent 协作模式（通用版 v2.1）
 
 **一句话**：让"执行 + 独立复核 + 人类裁决"成为任何任务的默认工作方式——干活有讨论、结论有复核、事实有来源、过程有留痕。
 
@@ -24,8 +24,18 @@ description: 通用双 Agent 协作模式（主执行 Agent + DeepSeek 独立评
 | **日常搜索/调研/信息收集** | 不讨论 | **关键事实交叉验证** | 结论靠证据链不靠记忆 |
 | **琐事/纯查询**（查定义、确认小事实） | 跳过 | 跳过 | 但引用的关键事实仍须有来源 |
 
-## 核心流程（5 步）
+## 核心流程（6 步）
 
+0. **环境检查与降级门禁**（开工前，不可跳过）：探测 DeepSeek 评审通道（`DEEPSEEK_API_KEY` 可注入且可用）。
+   - 可用 → 正常进入 1-5 步
+   - 不可用 → **必须先单独询问用户并等待裁决**（禁止未询问自行认定"环境无注入入口"），给三选项：
+     - **A 提供 key**（注入方式见 scripts/deps.md，按密钥规范不落盘）
+     - **B 同意降级本地评审**（见 review-framework.md 独立性判据：降级=degraded，不算独立复核；**重大/不可逆/对外交付类不可选 B**）
+     - **C 跳过评审**（仅限琐事/纯查询；关键事实仍须有来源）
+   - **路由归属（无 key 时）**：重大/不可逆/对外交付 → 无独立复核 BLOCKED（不可选 B）；**功能性工作**（路由表"事后复核必须"级）→ 可选 A 或 B，**不得归入 C**；**日常搜索/调研** → 主 Agent 联网取证照常，降级时档案标注"DeepSeek 交叉验证缺失"；琐事/纯查询 → 可 C
+   - **分类争议**：任务类型归属有歧义 → 按更严格档处理（fail-closed）；用户说"讨论"即不可跳过
+   - **不可逆动作（发布/承诺/花钱决策）在无独立复核时 BLOCKED 上报用户，禁止擅自继续**
+   - 降级必须落档案：`status=degraded` + 用户同意记录（见 light-archive.md）
 1. **拆解任务**：目标、范围、交付物、关键事实点（哪些事实必须联网验证）
 2. **事前对齐**（按路由表）：动手前把方案（目标/关键取舍/风险）发给 DeepSeek 讨论 → 通过/有条件通过才动手；拒绝则改方案
 3. **执行 + 联网取证**：主 Agent 干活；关键事实用搜索工具验证（见 references/research.md——来源分级、交叉验证、引用格式）
@@ -38,6 +48,7 @@ description: 通用双 Agent 协作模式（主执行 Agent + DeepSeek 独立评
 - 评审必须落盘（原始请求/响应 + 结论），供事后审计
 - **收益评估前置**：向用户提出拍板选项时，同步附上每个选项的收益/影响评估
 - 触发条件：红线/不可逆/对外交付类 + 用户明确说"讨论"的任何改动，不可跳过
+- **降级禁止 fail-open**：DeepSeek 不可用时，任何降级必须先单独声明 + 用户同意 + 落档案；不可逆动作 BLOCKED 上报用户，禁止擅自继续；**"没有 key 注入入口"不得未经询问自行认定——先问用户**
 
 ## 联网取证（强制纪律）
 
@@ -62,9 +73,11 @@ DEEPSEEK_API_KEY=<key> python3 scripts/deepseek_review.py \
 
 ## 详细参考
 
-- [references/review-framework.md](references/review-framework.md)：评审强制框架（证据引用/反证/负向诚实/结论三态）——发起评审必读
+- [references/review-framework.md](references/review-framework.md)：评审强制框架（证据引用/反证/负向诚实/结论三态/**独立性判据 5 条**）——发起评审必读
 - [references/research.md](references/research.md)：联网取证流程（事实点拆解/来源分级/交叉验证/引用格式）
-- [references/light-archive.md](references/light-archive.md)：轻量档案规范（无仓库存工作区）
+- [references/light-archive.md](references/light-archive.md)：轻量档案规范（无仓库存工作区；**含降级记录字段**）
 - [references/channels.md](references/channels.md)：评审通道参数、prompt 模板
 - [references/archive-format.md](references/archive-format.md)：企业级档案（高级模式，索引/RV/frontmatter）
 - [references/gates.md](references/gates.md)：可选高级模式——git 门禁与讨论闸门
+- [references/env-check.md](references/env-check.md)：**环境自检清单（装好技能后 1 分钟自查降级门禁是否生效）**
+- [scripts/deps.md](scripts/deps.md)：运行依赖与 **key 配置指南（三类注入入口）**
