@@ -53,6 +53,16 @@ description: 双 Agent 协作评审工作流（主执行 Agent + DeepSeek 独立
 
 ## 快速开始
 
+**0. 安装门禁（推荐默认——协作质量生命线，不做则讨论靠自觉）**：
+
+```bash
+# 一键安装 commit-msg 钩子（未评审的提交会被机器拒绝）
+scripts/install-gate.sh <项目根目录>
+# 索引未建立时有引导期豁免；首个评审档案建立后强制生效
+```
+
+**1. 发起评审前先读 [references/review-framework.md](references/review-framework.md)**——按强制框架写 prompt（证据引用/反证检查/负向诚实/结论三态/反选择性举证/上下文注入预算上限），这是"评审质量接近项目侧"的关键。
+
 ```bash
 # 事前对齐（动手前）
 DEEPSEEK_API_KEY=<key> python3 scripts/deepseek_review.py \
@@ -83,5 +93,7 @@ DEEPSEEK_API_KEY=<key> python3 scripts/deepseek_review.py \
 ## 详细参考
 
 - [references/channels.md](references/channels.md)：评审通道参数、prompt 模板、结论词表
+- [references/review-framework.md](references/review-framework.md)：**评审强制框架**（证据引用/反证检查/负向诚实/结论三态/反选择性举证/上下文注入上限）——发起评审必读
 - [references/archive-format.md](references/archive-format.md)：档案目录结构、索引格式、DECISIONS/TODO/OPEN_ISSUES 规范
-- [references/gates.md](references/gates.md)：Git 提交门禁（commit-msg 钩子三闸门）与讨论闸门规则（定时任务/周期自检触发条件）
+- [references/gates.md](references/gates.md)：Git 提交门禁（commit-msg 钩子，推荐默认安装）与讨论闸门规则（定时任务/周期自检触发条件）
+- scripts：`deepseek_review.py`（通用最小版调用）、`install-gate.sh` + `commit-msg` + `check_review.py`（通用版门禁三件套）

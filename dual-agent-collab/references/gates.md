@@ -2,16 +2,20 @@
 
 两层强制：**Git 提交门禁**（机器强制，防漏评审）+ **讨论闸门**（周期任务/定时任务触发条件）。
 
-## Git 提交门禁（commit-msg 钩子，可选但强烈建议）
+## Git 提交门禁（commit-msg 钩子，**推荐默认安装——协作质量生命线**）
 
-在 Git 仓库 `.githooks/commit-msg` 安装，`git config core.hooksPath .githooks`。三闸门：
+**为什么不装就不强制**：门禁的唯一作用是让"未评审的提交"被机器拒绝；不装钩子 = 讨论/评审全靠执行者自觉，会漏（实战已验证）。安装：`scripts/install-gate.sh <项目根目录>`（复制 commit-msg 到 `.githooks/` + `git config core.hooksPath .githooks`）。
 
-1. **闸门 1（ID 引用存在性）**：提交信息必须含合法 ID 引用（`RV-*` / `F-*` / `D-*` / `ISS-*`）→ 防止"未评审的提交"
-2. **闸门 2（红线 diff_hash 匹配，机器规则）**：命中红线文件（核心代码/脚本/规则）的提交，必须引用**已批准（adopted）且 diff_hash 与当前 staged diff 一致**的 RV，否则拒绝 → 防止"后补评审"
-   - 实现提示：提交前计算 staged 文件的 sha256，写入评审档案；钩子对比当前 staged hash 与档案 hash
-3. **闸门 3（功能提交需事前对齐）**：功能提交（`feat(` 开头）必须引用已批准（adopted）的 **scheme 通道 RV**（phase=scheme 且 feature 匹配）→ 防止"没讨论就动手"
+**通用版两闸门（install-gate.sh 装好即生效）**：
 
-**轻量通道（[LIGHT]）**：非功能、非红线的小改动（文案/样式等）可免 scheme 评审，但提交仍需引用已 adopted 的 RV 或走白名单判定。**限额与判定规则必须写在脚本里（gate_rules.yaml），不能靠自觉；技能不复制限额数字（防止与实现漂移），以 gate_rules.yaml 为唯一真源。**参考实现限额（invoice-precheck gate_rules.yaml）：≤3 文件 / ≤30 行 / 单行 ≤500 字符 / 7 天 ≤50 行 / **7 天 ≤5 次 LIGHT 提交**；白名单仅 `*.md` 与 `docs/index.html`（且 index.html 限定"非 demo_data 段 + 非 script 区间"的文案/样式改动）。
+1. **闸门 1（ID 引用存在性）**：提交信息必须含合法 ID 引用（`RV-*` / `GATE-*` / `DEC-*` / `ISS-*`）→ 防止"未评审的提交"
+2. **闸门 2（RV 存在 + adopted）**：引用的 RV/GATE 必须在评审索引中存在且状态为 adopted（宽容正则：竖线分隔单元以 adopted 开头，容忍空格差异）→ 防止"伪造号/冒用 pending 号"
+3. **引导期豁免**：索引文件不存在/为空 → 放行（打印提示）；建立首个评审档案后强制生效（解决"归档本身也是一次提交"的鸡生蛋）
+4. **可选 diff_hash 告警（不阻断）**：索引行带 diff_hash 时比对当前 staged，不一致仅 WARNING（提示"评审对象与提交对象可能不一致"）——完整版为阻断校验（见下）
+
+**项目级完整版（高级用法，非通用默认）**：三闸门（ID 引用存在性 + 红线 diff_hash 阻断匹配 + 功能提交需事前对齐 scheme-RV）+ [LIGHT] 轻量通道（限额判定写在 gate_rules 脚本，不能靠自觉）。参考实现：invoice-precheck 仓 `.githooks/commit-msg` + `scripts/trace_gate.py` + `scripts/gate_rules.yaml`。通用版砍掉红线 diff_hash 阻断是为了最小可用；需要"评审对象 = 提交对象"级强保证的项目，升级到完整版。
+
+**索引契约（通用版钩子依赖，格式耦合是实战踩过的坑）**：索引一行一条、UTF-8；状态列写 `| adopted |`（空格差异被宽容，但禁止写成 pending/rejected 冒充）；行内须含"日期-RV号"前缀（如 `2026-09-28-03-`），钩子按该前缀定位；只追加不删历史行。
 
 ## 讨论闸门规则（周期自检/定时任务触发时）
 

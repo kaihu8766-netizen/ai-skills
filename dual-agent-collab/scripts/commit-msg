@@ -1,0 +1,15 @@
+#!/bin/sh
+# dual-agent-collab 通用版 commit-msg 门禁（RV-20260928-07 落地）
+# 闸门 1：message 必须含合法 ID 引用（RV/GATE/DEC/ISS）
+# 闸门 2：引用的 RV 必须在评审索引中存在且 adopted（未评审的提交被机器拒绝）
+# 闸门 3：引导期豁免——索引不存在时放行，首个评审档案建立后强制生效
+# 安装：scripts/install-gate.sh（或 git config core.hooksPath .githooks）
+MSG_FILE="$1"
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+CHECK="$SCRIPT_DIR/../scripts/check_review.py"
+if [ -f "$CHECK" ]; then
+    python3 "$CHECK" "$MSG_FILE" || exit $?
+else
+    echo "[commit-msg] WARN：check_review.py 不存在，跳过校验（门禁未完整安装）" >&2
+fi
+exit 0
