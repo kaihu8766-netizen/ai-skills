@@ -63,7 +63,7 @@ provenance: live | backfill    # live=实时评审；backfill=事后补录
 
 ## 关键台账（同目录或工作区根）
 
-- `DECISIONS.md`：重大决策记录——决策号、背景、选项对比、选择、理由、**收益评估**（用户拍板后必附）
+- `DECISIONS.md`：重大决策记录——决策号、背景、选项对比、选择、理由、**收益评估**（待拍板选项附带：列出选项时每个选项同步附收益/影响评估，评估放在拍板之前）
 - `TODO.md`：待办清单（待办→进行中→待拍板→已完成）；完成项双向核销 OPEN_ISSUES 对应项
 - `OPEN_ISSUES.md`：未决问题（问题号、描述、优先级、状态、关联 RV/T）
 - `DailySummary/YYYY-MM-DD.md`：定期自检结果（硬检查 + 问题清单 + DeepSeek 意见 + 待拍板项）
