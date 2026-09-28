@@ -1,10 +1,10 @@
-# 门禁与闸门（gates.md）
+# 门禁与闸门（gates.md）· 可选高级模式
 
-两层强制：**Git 提交门禁**（机器强制，防漏评审）+ **讨论闸门**（周期任务/定时任务触发条件）。
+**默认模式（无 git 仓库）**：靠"讨论纪律 + 轻量档案留痕"兜底——**这是 fail-closed 语义，不是没有兜底**：讨论不是可选项（SKILL.md 讨论纪律），档案必须落盘（light-archive.md），结论三态如实记录。无仓库 ≠ 无约束，只是约束从"机器拒绝"变为"纪律 + 可审计留痕"。
 
-## Git 提交门禁（commit-msg 钩子，**推荐默认安装——协作质量生命线**）
+**高级模式（有 git 仓库）**：装 commit-msg 钩子后，"未评审的提交"被**机器拒绝**（协作质量生命线，防自觉失效）。安装：`scripts/install-gate.sh <项目根目录>`（复制 commit-msg 到 `.githooks/` + `git config core.hooksPath .githooks`）。
 
-**为什么不装就不强制**：门禁的唯一作用是让"未评审的提交"被机器拒绝；不装钩子 = 讨论/评审全靠执行者自觉，会漏（实战已验证）。安装：`scripts/install-gate.sh <项目根目录>`（复制 commit-msg 到 `.githooks/` + `git config core.hooksPath .githooks`）。
+## Git 提交门禁（commit-msg 钩子，高级模式）
 
 **通用版两闸门（install-gate.sh 装好即生效）**：
 

@@ -1,6 +1,6 @@
-# 档案规范（archive-format.md）
+# 档案规范（archive-format.md）· 企业级模式
 
-档案是"全过程可溯源"的落地。目录默认 `<工作区>/dual-agent/reviews/`（可用 `--out-dir` 覆盖），结构：
+**默认轻量模式**（无 git 仓库，存主 Agent 工作区）见 [light-archive.md](light-archive.md)。**本文档是企业级升级路径**：需要索引/RV/raw/双 hash 级可溯源（代码项目、多轮评审、审计）时启用。目录默认 `<工作区>/dual-agent/reviews/`（可用 `--out-dir` 覆盖），结构：
 
 ```text
 dual-agent/
