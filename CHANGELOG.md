@@ -29,3 +29,7 @@
 ## 2026-10-09（v2.5）
 
 - **gates.md 补三条实战教训（从 invoice-precheck 项目 scheme 闸门 bug 提炼）**：①跨仓共用引擎的死路径（闸门不显式传 --rules 会默认读引擎所在仓规则，本仓类恒不命中=静默绕过，铁律：每仓 commit-msg 都显式传 --rules）；②规则文件自指逃逸（判据与被判对象同一份 yaml，改文件删段即绕过，防法：路径硬编码进引擎且触发事前对齐层）；③scheme 闸门诚实边界（commit-msg 只要求档案存在、不证时序，同 commit 补档可过，时序靠事后审计兜）。SKILL.md 版本号 v2.4→v2.5。
+
+## 2026-10-09（v2.6）
+
+- **gates.md 补五条 fail-closed 实战教训（从 F-20261009-02 落地提炼）**：①历史兼容 fallback 必须白名单制（phase 缺失不能自动放行，须 legacy_scheme:true 显式标记，否则删行=绕过=fail-open）；②双源校验兼容 covered 状态（历史归档，只认 adopted 会误杀几十个旧档案）；③改闸门后必须对现网全部已生效 scheme 档案逐个回放零误杀才上线；④discussion 触发应是 rules 文件独立维度（discussion_required 列表，不靠 risk_level 推导/模型自觉）；⑤改闸门必跑四类反例测试（跨feature拼凑/删字段绕过/无标记旧档案误放行/双源单边篡改）并入 CI。SKILL.md 版本号 v2.5→v2.6。
