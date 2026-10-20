@@ -1,6 +1,8 @@
 # ai-skills
 
-豆包用户的技能集（私有仓）。
+豆包用户的技能集（**公开仓**）。
+
+> **可见性声明（2026-10-21 用户拍板）**：本仓保持 public。文档早期写"私有仓"为建仓时口径，现以本条声明为准。
 
 ## 用法
 
@@ -22,4 +24,4 @@ cp -r ai-skills/dual-agent-collab ~/.doubao/agent_mode/workspace/.user_skills/
 
 任何对话框里说一句"**用双 Agent 模式帮我做 X**"（如"用双 Agent 模式帮我做一份前端简历"），主 Agent 会按技能流程：拆解任务 → 与 DeepSeek 讨论方案 → 联网取证执行 → DeepSeek 复核 → 交付并落档案。
 
-> 安全：本仓不含任何 API key（key 一律走环境变量，如 `DEEPSEEK_API_KEY`）。
+> **public 仓安全红线（强制）**：本仓为公开可见，任何提交不得包含——API key / token / 密码 / 真实发票 / 个人真实身份信息 / 内部路径。push 前必须敏感扫描（`grep -rniE "sk-[a-z0-9]{20,}|ghp_[a-z0-9]{20,}|/home/user|ak-[a-z0-9]{20,}"`），key 一律走环境变量（如 `DEEPSEEK_API_KEY`），不得写入任何文件。发现泄露立即 rotate key + 重写历史。
