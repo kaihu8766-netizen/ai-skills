@@ -2,6 +2,14 @@
 
 按日期倒序，一句话说明动机。
 
+## 2026-10-21
+
+- **v2.7 能力升级+分工2.0（dual-agent-collab）**：基于 DeepSeek V4.1 Flash（deepseek-flash 正式名，原生多模态视觉）与"各司其长"分工调研（豆包 Seed2.1 多模态 SOTA/百万长上下文/工具调度强 vs DS 代码 Codeforces3471/数学/推理强）。核心：模型名统一 deepseek-flash（消除旧名兼容路由断链风险）；deepseek_review.py 新增 --image 视觉通道（硬截断≤3张/次、base64内联、图须带元数据且原文片段仍必贴=辅助交叉印证非主判据）；评审记录 requested_model/actual_model 回显（能力基线锚定）；conclusion 检测顺序修复（防"拒绝'无条件通过'"误判）；SKILL.md 角色分工 2.0（感知核验归主 Agent 并结构化为可审计证据/逻辑批判归 DeepSeek 只审不写/代码主 Agent 写+DS 审）；证据纪律新增（原始产物与结论分离、F6 负向证据未覆盖清单、只审不写边界、运行时证据、配额纪律 1500+/2500+、峰谷定价提示）。DeepSeek 评审 RV-20261021-01/02 有条件通过（C1-C7 + F-C1~F-C6）全部落实，用户拍板，视觉通道实测通过（RV-20261021-03）。
+
+## 2026-09-30
+
+- **v2.3 讨论触发条件+讨论预算（dual-agent-collab）**：新增讨论触发条件（机器判据 high/结论不一致/主力自报不确定/人明确要求；不满足走轻量通道）；讨论预算（同主题连续 3 轮无新论点自动终止转人裁决、四要素输出、成本台账）
+
 ## 2026-09-29
 
 - **v2.1 降级门禁升级（dual-agent-collab）**：修复"静默降级"缺陷（无 DeepSeek key 时未询问即降级为子代理）。核心：SKILL.md 新增第 0 步「环境检查与降级门禁」（无 key 必须先单独询问用户并等待裁决，A 提供 key / B 同意降级 / C 跳过；重大/不可逆/对外交付类不可选 B，无独立复核 BLOCKED；路由归属明确功能性工作不得归 C；分类争议 fail-closed）；review-framework.md 新增「独立复核判据 5 条」（子代理=degraded 不算独立复核，硬门只认受控通道 RV 档案）+ 自证清白反制；light-archive.md 新增「降级记录」字段（status=degraded + 用户同意 + 硬门口径）；deepseek_review.py 补哈希留痕（raw prompt_hash/response_hash + 索引行 hash，防落盘后改写）；deps.md 补 key 三类注入入口；新增 references/env-check.md（1 分钟环境自检）。DeepSeek 终审 RV-20260929-07 adopted。
